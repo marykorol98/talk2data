@@ -1,11 +1,12 @@
 # workflow.py
 
+import json
 import time
 from vllm import SamplingParams
 from langgraph.graph import StateGraph, END
 from langchain_core.output_parsers import JsonOutputParser
 import time
-
+from core.config import settings
 # Import prompt templates and schemas
 from core.prompts import (
     DECIDE_ACTION_PROMPT,
@@ -153,74 +154,117 @@ def route_action(state: AgentState) -> str:
         return "chat_response"
 
 
-def generate_code_node(state: AgentState) -> AgentState:
-    """Code generation with structured metadata handling, measure time."""
+async def generate_code_node(state: AgentState):
+    """Streaming code generation using vLLM, returning both stream tokens and final code block."""
+    import httpx
+    import time
+
     start = time.perf_counter()
+
     code_prompt = format_prompt(CODE_GENERATION_PROMPT, state)
+    accumulated = ""  # сюда накапливаем текст для итоговой обработки
 
-    sampling_params = SamplingParams(
-        max_tokens=512,
-        temperature=0.7,
-        top_p=0.95,
-        stop=["<|", "</s>"],
-        repetition_penalty=1.05,
-        presence_penalty=0.5,
-        seed=42,
-    )
+    async with httpx.AsyncClient(timeout=None) as client:
+        async with client.stream(
+            "POST",
+            "http://localhost:6001/v1/completions",
+            json={
+                "model": settings.LLM_MODEL_NAME,
+                "prompt": code_prompt,
+                "stream": True,
+                "max_tokens": 512,
+                "temperature": 0.7,
+                "top_p": 0.95,
+                "stop": ["<|", "</s>"],
+            }
+        ) as resp:
 
-    outputs = llm.generate([code_prompt], sampling_params)
-    generated_text = outputs[0].outputs[0].text
+            async for line in resp.aiter_lines():
+                if not line or not line.startswith("data:"):
+                    continue
 
-    # Extract code block (heuristic: inside triple backticks or entire text)
-    code_block = generated_text.split("```python")[-1].split("```")[0].strip()
+                payload = line[len("data:") :].strip()
+                if payload == "[DONE]":
+                    break
+
+                data = json.loads(payload)
+                token = data["choices"][0]["text"]
+
+                accumulated += token  # сохраняем токены в общий буфер
+
+                # STREAM на фронт
+                yield {"stream_token": token, "type": "code"}
+
+    # === Когда генерация закончена, формируем финальный код ===
+
+    # Вырезаем ```python ... ```
+    if "```python" in accumulated:
+        code_block = accumulated.split("```python")[-1].split("```")[0].strip()
+    else:
+        # fallback — всё содержимое
+        code_block = accumulated.strip()
 
     elapsed = time.perf_counter() - start
+
     timing_info = state.get("timing_info", {})
     timing_info["generate_code_sec"] = round(elapsed, 4)
     state["timing_info"] = timing_info
 
-    logger.info(f"[generate_code] Generated code: {code_block[:300]}...")
-
     state.update(
         {
             "generated_code": code_block,
-            "response_message": "Here's the generated code:",
+            "response_message": "Here is the generated code:",
         }
     )
-    return state
+
+    # После стрима финальный state
+    yield state
 
 
-def generate_chat_response_node(state: AgentState) -> AgentState:
-    """Chat response generation with TTS integration, measure time."""
-    start = time.perf_counter()
+
+async def generate_chat_response_node(state: AgentState):
+    """Стриминг токенов от vLLM вместо синхронной генерации."""
+    import httpx
     chat_prompt = format_prompt(CHAT_RESPONSE_PROMPT, state)
 
-    sampling_params = SamplingParams(
-        max_tokens=200, temperature=0.7, top_p=0.9, stop=["</s>"]
-    )
+    state["response_message"] = ""   # чтобы накапливать полный ответ
 
-    outputs = llm.generate([chat_prompt], sampling_params)
-    response = outputs[0].outputs[0].text.strip()
-    elapsed_llm = time.perf_counter() - start
+    async with httpx.AsyncClient(timeout=None) as client:
+        async with client.stream(
+            "POST",
+            "http://localhost:6001/v1/completions",  # vLLM endpoint
+            json={
+                "model": settings.LLM_MODEL_NAME,
+                "prompt": chat_prompt,
+                "stream": True,
+                "max_tokens": 200,
+                "temperature": 0.7,
+                "top_p": 0.9,
+                "stop": ["</s>"],
+            }
+        ) as resp:
 
-    # Attempt TTS
-    # tts_start = time.perf_counter()
-    # audio_b64 = None
-    # try:
-    #     audio_bytes = text_to_speech(response)
-    #     audio_b64 = base64.b64encode(audio_bytes).decode("utf-8")
-    # except Exception as e:
-    #     logger.info(f"TTS Error: {str(e)}")
-    # tts_elapsed = time.perf_counter() - tts_start
+            async for line in resp.aiter_lines():
+                if not line or not line.startswith("data:"):
+                    continue
 
-    timing_info = state.get("timing_info", {})
-    timing_info["generate_chat_response_sec"] = round(elapsed_llm, 4)
-    # timing_info["tts_sec"] = round(tts_elapsed, 4)
-    state["timing_info"] = timing_info
+                payload = line[len("data:") :].strip()
 
-    # state["response_audio"] = audio_b64
-    state["response_message"] = response
-    return state
+                if payload == "[DONE]":
+                    break
+
+                data = json.loads(payload)
+                token = data["choices"][0]["text"]
+
+                # накапливаем финальный текст для истории
+                state["response_message"] += token
+
+                # STREAM наружу (в handler_converse → RabbitMQ)
+                yield {"stream_token": token}
+
+    # финальное состояние возвращаем при завершении узла
+    yield state
+
 
 
 def create_workflow():

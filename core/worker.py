@@ -1,8 +1,8 @@
 # worker.py
+import asyncio
 import base64
 import json
 from pathlib import Path
-import time
 import pika
 from pika.exceptions import AMQPConnectionError, AMQPChannelError
 # from models import whisper_model
@@ -76,52 +76,69 @@ def load_result_locally(filename: str = "result.json") -> dict:
         return {}
 
 
-def handle_converse(data: dict):
-    """Обработка текстового запроса (LLM pipeline)."""
-    start = time.perf_counter()
-    try:
-        # Собираем состояние
-        req = ConversationRequest(**data)
-        workflow = create_workflow()
-        initial_state = {
-            "user_input": req.user_input,
-            "metadata": req.metadata,
-            "conversation_history": req.conversation_history,
-            "generated_code": None,
-            "response_message": None,
-            "response_audio": None,
-            "decision": None,
-            "timing_info": {},
-        }
+async def handle_converse(data: dict, ch):
+    """LLM pipeline с потоком токенов через RabbitMQ."""
+    req = ConversationRequest(**data)
+    workflow = create_workflow()
 
-        result = workflow.invoke(initial_state)
+    initial_state = {
+        "user_input": req.user_input,
+        "metadata": req.metadata,
+        "conversation_history": req.conversation_history,
+        "generated_code": None,
+        "response_message": "",
+        "response_audio": None,
+        "decision": None,
+        "timing_info": {},
+    }
 
-        # для дебага вместо workflow, если нет времени разворачивать llm:
-        # result = load_result_locally()
+    async for event in workflow.astream(initial_state):
 
-        total_time = round(time.perf_counter() - start, 3)
+        # 1) STREAM TOKENS (частичный ответ)
+        if "stream_token" in event:
+            ch.basic_publish(
+                exchange=settings.EXCHANGE,
+                routing_key=settings.ROUTING_KEY,
+                body=json.dumps({
+                    "status": "stream",
+                    "token": event["stream_token"],
+                    "project_id": data.get("project_id")
+                })
+            )
+            continue
 
-        # Формируем финальный ответ
-        response = {
-            "status": "done",
-            "task": "llm_agent_response",
-            "result": {
-                "code": result.get("generated_code"),
-                "message": result.get("response_message"),
-                "updated_history": result["conversation_history"]
-                + [
-                    {
-                        "user": req.user_input,
-                        "system": result.get("generated_code")
-                        or result.get("response_message"),
-                    }
-                ],
-                "timing": {**result.get("timing_info", {}), "total_time": total_time},
-            },
-        }
-        return response
-    except Exception as e:
-        return {"status": "error", "task": "converse", "error": str(e)}
+        # 2) FINISHED NODE (финальное состояние)
+        if isinstance(event, dict) and "response_message" in event:
+            # это итоговое состояние
+            final = event
+
+            updated_history = req.conversation_history + [
+                {
+                    "user": req.user_input,
+                    "system": final.get("response_message") or final.get("generated_code"),
+                }
+            ]
+
+            result = {
+                "status": "done",
+                "task": "llm_agent_response",
+                "result": {
+                    "message": final.get("response_message"),
+                    "code": final.get("generated_code"),
+                    "updated_history": updated_history,
+                    "timing": final.get("timing_info", {}),
+                },
+                "project_id": data.get("project_id")
+            }
+
+            ch.basic_publish(
+                exchange=settings.EXCHANGE,
+                routing_key=settings.ROUTING_KEY,
+                body=json.dumps(result)
+            )
+
+            return
+
 
 
 def handle_transcribe(data: dict):
@@ -147,30 +164,40 @@ task_mapping = {"converse": handle_converse, "transcribe": handle_transcribe}
 
 
 def callback(ch, method, properties, body):
-    """Основная функция обработки входящих задач."""
+    """Основная функция обработки входящих задач (с поддержкой async-хэндлеров)."""
     try:
         msg = json.loads(body)
         task_type = msg.get("task")
         data = msg.get("data", {})
+
         handler = task_mapping.get(task_type)
-
         logger.info(f"Received task: {task_type}")
+
         if handler is None:
-            err_msg = f"Unknown task type: {task_type}"
-            logger.warning(err_msg)
-            response = {"status": "error", "error": err_msg}
+            # неизвестная задача → отправляем ошибку
+            response = {"status": "error", "error": f"Unknown task: {task_type}"}
+
         else:
-            response = handler(data)
+            # --- ВАЖНО ---
+            # handle_converse теперь async def → его нужно await-ить
+            # но callback синхронный, поэтому используем asyncio.run()
+            if asyncio.iscoroutinefunction(handler):
+                response = asyncio.run(handler(data, ch))
+            else:
+                response = handler(data)
 
-        response["project_id"] = data.get("project_id")
+        # добавляем project_id
+        if isinstance(response, dict):
+            response["project_id"] = data.get("project_id")
 
-        # Отправляем результат обратно
-        ch.basic_publish(
-            exchange=settings.EXCHANGE,
-            routing_key=settings.ROUTING_KEY,
-            body=json.dumps(response),
-            mandatory=True,
-        )
+        # финальный publish (важно: потоковые токены handle_converse уже отправил сам)
+        if response:
+            ch.basic_publish(
+                exchange=settings.EXCHANGE,
+                routing_key=settings.ROUTING_KEY,
+                body=json.dumps(response),
+                mandatory=True,
+            )
 
         logger.info(
             f"Sent response for {task_type}: {response.get('status')} {response.get('error', '')}"
@@ -178,7 +205,7 @@ def callback(ch, method, properties, body):
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     except Exception as e:
-        logger.info(f"Error handling message: {e}")
+        logger.error(f"Callback error: {e}", exc_info=True)
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 
 
