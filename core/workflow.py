@@ -2,6 +2,7 @@
 
 import atexit
 import copy
+import json
 import logging
 import time
 from string import Template
@@ -16,10 +17,16 @@ from core.models import get_llm, get_tokenizer
 # Import prompt templates and schemas
 from core.prompts import (
     CHAT_RESPONSE_PROMPT,
+    CODE_BEGIN,
+    CODE_END,
     CODE_GENERATION_PROMPT,
     DECIDE_ACTION_PROMPT,
+    PLAN_END,
+    build_code_prompt,
+    build_plan_prompt,
 )
 from core.schemas import AgentState, Decision
+from core.tools import process_output_code, process_plan
 
 logger = logging.getLogger(__name__)
 
@@ -154,42 +161,70 @@ def route_action(state: AgentState) -> str:
     except Exception:
         return "chat_response"
 
-
-def generate_code_node(state: AgentState) -> AgentState:
-    """Code generation with structured metadata handling, measure time."""
+def generate_plan(state: AgentState) -> AgentState:
     start = time.perf_counter()
-    code_prompt = format_prompt(CODE_GENERATION_PROMPT, state)
+    prompt = tokenizer.apply_chat_template(build_plan_prompt(state), tokenize=False, add_generation_prompt=True)
 
-    logger.info(f"[code_prompt] Prompt for code generation: {code_prompt}")
-    sampling_params = SamplingParams(
-        max_tokens=512,
-        temperature=0.0,  # 0.7
-        top_p=0.95,
-        stop=["<|", "</s>"],
-        repetition_penalty=1.05,
-        presence_penalty=0.5,
+    params = SamplingParams(
+        max_tokens=256,
+        temperature=0.0,   # JSON-стабильность
+        top_p=1.0,
         seed=42,
+        # IMPORTANT for Qwen: do NOT stop on "<|"
+        stop=[PLAN_END],   # безопасно: стопим по нашему маркеру окончания
     )
 
-    outputs = llm.generate([code_prompt], sampling_params)
-    generated_text = outputs[0].outputs[0].text
+    out = llm.generate([prompt], params)
+    raw = (out[0].outputs[0].text or "").strip()
 
-    # Extract code block (heuristic: inside triple backticks or entire text)
-    code_block = generated_text.split("```python")[-1].split("```")[0].strip()
+    plan = process_plan(raw)
+    
+    if not plan:
+        plan = {
+            "intent": "stats",
+            "columns_used": [],
+            "ops": ["fallback: plan JSON parse failed"],
+            "plot_spec": {},
+            "notes": "plan generation failed; proceed conservatively",
+        }
 
     elapsed = time.perf_counter() - start
-    timing_info = state.get("timing_info", {})
-    timing_info["generate_code_sec"] = round(elapsed, 4)
-    state["timing_info"] = timing_info
+    timing = state.get("timing_info", {})
+    timing["generate_plan_sec"] = round(elapsed, 4)
+    state["timing_info"] = timing
 
-    logger.info(f"[generate_code] Generated code: {code_block[:300]}...")
+    state["plan"] = plan
+    return state
 
-    state.update(
-        {
-            "generated_code": code_block,
-            "response_message": "Here's the generated code:",
-        }
+
+def generate_code_node(state: AgentState) -> AgentState:
+    start = time.perf_counter()
+    state = generate_plan(state)
+    
+    prompt = tokenizer.apply_chat_template(build_code_prompt(state), tokenize=False, add_generation_prompt=True)
+
+    params = SamplingParams(
+        max_tokens=640,
+        temperature=0.0,
+        top_p=1.0,
+        repetition_penalty=1.05,
+        presence_penalty=0.0,  # стабильнее при temp=0
+        seed=42,
+        stop=[CODE_END],       # стопим по нашему маркеру
     )
+
+    out = llm.generate([prompt], params)
+    raw = (out[0].outputs[0].text or "").strip()
+
+    code = process_output_code(raw)
+    
+    elapsed = time.perf_counter() - start
+    timing = state.get("timing_info", {})
+    timing["generate_code_sec"] = round(elapsed, 4)
+    state["timing_info"] = timing
+
+    state["generated_code"] = code.strip()
+    state["response_message"] = "Here's the generated code:"
     return state
 
 

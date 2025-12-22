@@ -1,0 +1,39 @@
+id,expected_decision,language,decision_score,semantic_similarity,code_score,tags,difficulty,expected_facts,forbidden_facts,expected_code,model_plot_error,expected_plot_path,heuristic_score,result_match
+code_001_describe,code_generation,en,True,,0.45,"['code', 'describe']",easy,,,df.describe(),[Errno 2] No such file or directory: 'your_dataset.csv',,0.9,False
+code_002_pairplot,code_generation,en,True,,0.35,"['code', 'plot']",medium,,,"import plotly.express as px
+fig = px.scatter_matrix(df, dimensions=df.columns, color=""species"")
+fig.show()",[Errno 2] No such file or directory: 'path_to_your_file.csv',core/evaluation/report_2_added_planning_code_stage/plots/code_002_pairplot_expected.png,0.7,False
+code_003_train_model,code_generation,en,True,,0.383,"['code', 'model']",medium,,,"from sklearn.linear_model import LogisticRegression
+
+X = df.drop(columns=[""species""])
+y = df[""species""]
+
+model = LogisticRegression(max_iter=200)
+model.fit(X, y)",[Errno 2] No such file or directory: 'your_dataset.csv',,0.767,False
+code_001_describe,code_generation,ru,True,,0.45,"['code', 'describe']",easy,,,df.describe(),[Errno 2] No such file or directory: 'your_dataset.csv',,0.9,False
+code_002_pairplot,code_generation,ru,True,,0.35,"['code', 'plot']",medium,,,"import plotly.express as px
+fig = px.scatter_matrix(df, dimensions=df.columns, color=""species"")
+fig.show()",[Errno 2] No such file or directory: 'path_to_your_file.csv',core/evaluation/report_2_added_planning_code_stage/plots/code_002_pairplot_expected.png,0.7,False
+code_003_train_model,code_generation,ru,True,,0.383,"['code', 'model']",medium,,,"from sklearn.linear_model import LogisticRegression
+
+X = df.drop(columns=[""species""])
+y = df[""species""]
+
+model = LogisticRegression(max_iter=200)
+model.fit(X, y)",[Errno 2] No such file or directory: 'your_dataset.csv',,0.767,False
+chat_001_what_is_iris,chat_response,en,True,0.079,,"['chat', 'iris description']",easy,"['dataset contains measurements of petals and sepals', 'three iris species']",[],,,,,
+chat_002_how_many_classes,chat_response,en,True,0.067,,"['chat', 'classes']",easy,"['three classes', 'setosa', 'versicolor', 'virginica']",[],,,,,
+chat_003_best_features,chat_response,en,False,0.063,,"['chat', 'analysis']",medium,"['petal length', 'petal width']",[],,[Errno 2] No such file or directory: 'iris.csv',,,
+chat_004_easiest_class,chat_response,en,True,0.016,,"['chat', 'analysis']",medium,"['setosa', 'shorter petals', 'wider petals']",[],,,,,
+theory_001_overfitting,chat_response,en,True,0.0,,"['theory', 'ml']",easy,"['model fits training data too well', 'poor generalization to new data']",['overfitting improves performance on unseen data'],,,,,
+theory_002_train_test_split,chat_response,en,True,0.0,,"['theory', 'ml']",easy,"['evaluate model on unseen data', 'prevent data leakage']",['to increase training accuracy'],,,,,
+theory_003_regularization,chat_response,en,True,0.0,,"['theory', 'ml']",medium,"['adds penalty to model complexity', 'reduces overfitting']",['regularization increases model variance'],,,,,
+theory_004_bias_variance,chat_response,en,True,0.034,,"['theory', 'ml']",medium,"['bias refers to error from simplifying assumptions', 'variance refers to sensitivity to training data', 'tradeoff between bias and variance']",['bias and variance can both be minimized independently'],,,,,
+chat_001_what_is_iris,chat_response,ru,True,0.094,,"['chat', 'описание ириса']",easy,"['датасет содержит измерения лепестков и чашелистиков', 'три вида ириса']",['животные'],,,,,
+chat_002_how_many_classes,chat_response,ru,True,0.812,,"['chat', 'классы']",easy,['три класса'],[],,,,,
+chat_003_best_features,chat_response,ru,False,0.052,,"['chat', 'анализ']",medium,"['длина лепестка', 'ширина лепестка']",[],,[Errno 2] No such file or directory: 'iris.csv',,,
+chat_004_easiest_class,chat_response,ru,True,0.459,,"['chat', 'анализ']",medium,"['setosa', 'короче лепестки', 'шире лепестки']",[],,,,,
+theory_001_overfitting,chat_response,ru,True,0.206,,"['theory', 'ml']",easy,"['модель слишком хорошо подстраивается под обучающую выборку', 'плохо обобщает на новые данные']",['переобучение улучшает качество на новых данных'],,,,,
+theory_002_train_test_split,chat_response,ru,True,0.271,,"['theory', 'ml']",easy,"['оценка качества модели на невидимых данных', 'предотвращение утечки данных']",['для увеличения точности на обучающей выборке'],,,,,
+theory_003_regularization,chat_response,ru,True,0.0,,"['theory', 'ml']",medium,"['добавляет штраф за сложность модели', 'уменьшает переобучение']",['регуляризация увеличивает разброс модели'],,,,,
+theory_004_bias_variance,chat_response,ru,True,0.334,,"['theory', 'ml']",medium,"['смещение связано с упрощающими предположениями модели', 'разброс связан с чувствительностью к обучающим данным', 'существует компромисс между смещением и разбросом']",['смещение и разброс можно минимизировать независимо'],,,,,

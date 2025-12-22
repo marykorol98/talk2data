@@ -1,0 +1,790 @@
+{
+  "run_id": "infer_2_added_planning_code_stage",
+  "timestamp": "2025-12-22T13:30:13.326751",
+  "results": [
+    {
+      "benchmark_id": "code_001_describe",
+      "expected_decision": "code_generation",
+      "model_decision": {
+        "action": "code_generation"
+      },
+      "generated_code": "import pandas as pd\nimport plotly.express as px\n\n# Load the dataset\ndf = pd.read_csv('your_dataset.csv')\n\n# Calculate statistics\nstatistics = df.describe()\n\n# Display statistics\nprint(statistics)",
+      "response_message": "Here's the generated code:",
+      "timing_info": {
+        "decide_action_sec": 2.1289,
+        "generate_plan_sec": 7.2709,
+        "generate_code_sec": 11.3218
+      },
+      "raw_state": {
+        "user_input": "Write code that outputs statistics for the dataset.",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": "import pandas as pd\nimport plotly.express as px\n\n# Load the dataset\ndf = pd.read_csv('your_dataset.csv')\n\n# Calculate statistics\nstatistics = df.describe()\n\n# Display statistics\nprint(statistics)",
+        "response_message": "Here's the generated code:",
+        "response_audio": null,
+        "decision": {
+          "action": "code_generation"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.1289,
+          "generate_plan_sec": 7.2709,
+          "generate_code_sec": 11.3218
+        }
+      },
+      "benchmark_file": "iris_code_benchmark_en.json"
+    },
+    {
+      "benchmark_id": "code_002_pairplot",
+      "expected_decision": "code_generation",
+      "model_decision": {
+        "action": "code_generation"
+      },
+      "generated_code": "import pandas as pd\nimport plotly.express as px\n\n# Assuming df is already in the context\nfig = px.pairplot(df, diag_kind='histogram')\n\n# Display the plot\nfig.show()",
+      "response_message": "Here's the generated code:",
+      "timing_info": {
+        "decide_action_sec": 2.0381,
+        "generate_plan_sec": 6.5961,
+        "generate_code_sec": 10.3987
+      },
+      "raw_state": {
+        "user_input": "Create a pairplot of all features.",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": "import pandas as pd\nimport plotly.express as px\n\n# Assuming df is already in the context\nfig = px.pairplot(df, diag_kind='histogram')\n\n# Display the plot\nfig.show()",
+        "response_message": "Here's the generated code:",
+        "response_audio": null,
+        "decision": {
+          "action": "code_generation"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.0381,
+          "generate_plan_sec": 6.5961,
+          "generate_code_sec": 10.3987
+        }
+      },
+      "benchmark_file": "iris_code_benchmark_en.json"
+    },
+    {
+      "benchmark_id": "code_003_train_model",
+      "expected_decision": "code_generation",
+      "model_decision": {
+        "action": "code_generation"
+      },
+      "generated_code": "import pandas as pd\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import accuracy_score, confusion_matrix, classification_report\n\n# Load the dataset\ndata = pd.read_csv('your_dataset.csv')\n\n# Split the data into features and target\nX = data[['sepal_length', 'sepal_width', 'petal_length', 'petal_width']]\ny = data['species']\n\n# Split the data into training and testing sets\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\n\n# Train the logistic regression model\nmodel = LogisticRegression()\nmodel.fit(X_train, y_train)\n\n# Make predictions\ny_pred = model.predict(X_test)\n\n# Evaluate the model\naccuracy = accuracy_score(y_test, y_pred)\nconf_matrix = confusion_matrix(y_test, y_pred)\nclassification_report = classification_report(y_test, y_pred)\n\n# Print the results\nprint(f\"Accuracy: {accuracy}\")\nprint(\"Confusion Matrix:\")\nprint(conf_matrix)\nprint(\"Classification Report:\")\nprint(classification_report)",
+      "response_message": "Here's the generated code:",
+      "timing_info": {
+        "decide_action_sec": 2.1759,
+        "generate_plan_sec": 7.2444,
+        "generate_code_sec": 20.1189
+      },
+      "raw_state": {
+        "user_input": "Write code that trains a simple classifier on this data.",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": "import pandas as pd\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import accuracy_score, confusion_matrix, classification_report\n\n# Load the dataset\ndata = pd.read_csv('your_dataset.csv')\n\n# Split the data into features and target\nX = data[['sepal_length', 'sepal_width', 'petal_length', 'petal_width']]\ny = data['species']\n\n# Split the data into training and testing sets\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\n\n# Train the logistic regression model\nmodel = LogisticRegression()\nmodel.fit(X_train, y_train)\n\n# Make predictions\ny_pred = model.predict(X_test)\n\n# Evaluate the model\naccuracy = accuracy_score(y_test, y_pred)\nconf_matrix = confusion_matrix(y_test, y_pred)\nclassification_report = classification_report(y_test, y_pred)\n\n# Print the results\nprint(f\"Accuracy: {accuracy}\")\nprint(\"Confusion Matrix:\")\nprint(conf_matrix)\nprint(\"Classification Report:\")\nprint(classification_report)",
+        "response_message": "Here's the generated code:",
+        "response_audio": null,
+        "decision": {
+          "action": "code_generation"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.1759,
+          "generate_plan_sec": 7.2444,
+          "generate_code_sec": 20.1189
+        }
+      },
+      "benchmark_file": "iris_code_benchmark_en.json"
+    },
+    {
+      "benchmark_id": "code_001_describe",
+      "expected_decision": "code_generation",
+      "model_decision": {
+        "action": "code_generation"
+      },
+      "generated_code": "import pandas as pd\nimport plotly.express as px\n\n# Load the dataset\ndf = pd.read_csv('your_dataset.csv')\n\n# Calculate basic statistics\nstatistics = df.describe()\n\n# Create a scatter plot\nfig = px.scatter(df, x='sepal_length', y='sepal_width', color='species', title='Scatter Plot of Sepal Length vs Sepal Width by Species')\n\n# Show the plot\nfig.show()",
+      "response_message": "Here's the generated code:",
+      "timing_info": {
+        "decide_action_sec": 2.1749,
+        "generate_plan_sec": 7.2411,
+        "generate_code_sec": 13.3404
+      },
+      "raw_state": {
+        "user_input": "Напиши код, который выводит статистику по датасету.",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": "import pandas as pd\nimport plotly.express as px\n\n# Load the dataset\ndf = pd.read_csv('your_dataset.csv')\n\n# Calculate basic statistics\nstatistics = df.describe()\n\n# Create a scatter plot\nfig = px.scatter(df, x='sepal_length', y='sepal_width', color='species', title='Scatter Plot of Sepal Length vs Sepal Width by Species')\n\n# Show the plot\nfig.show()",
+        "response_message": "Here's the generated code:",
+        "response_audio": null,
+        "decision": {
+          "action": "code_generation"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.1749,
+          "generate_plan_sec": 7.2411,
+          "generate_code_sec": 13.3404
+        }
+      },
+      "benchmark_file": "iris_code_benchmark_ru.json"
+    },
+    {
+      "benchmark_id": "code_002_pairplot",
+      "expected_decision": "code_generation",
+      "model_decision": {
+        "action": "code_generation"
+      },
+      "generated_code": "import pandas as pd\nimport plotly.express as px\n\n# Load the DataFrame\ndf = pd.read_csv('path_to_your_file.csv')\n\n# Pairplot of all columns\nfig = px.pairplot(df, diag_kind='kde', hue='species')\n\n# Show the plot\nfig.show()",
+      "response_message": "Here's the generated code:",
+      "timing_info": {
+        "decide_action_sec": 2.0349,
+        "generate_plan_sec": 7.2538,
+        "generate_code_sec": 12.0775
+      },
+      "raw_state": {
+        "user_input": "Построй pairplot всех признаков.",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": "import pandas as pd\nimport plotly.express as px\n\n# Load the DataFrame\ndf = pd.read_csv('path_to_your_file.csv')\n\n# Pairplot of all columns\nfig = px.pairplot(df, diag_kind='kde', hue='species')\n\n# Show the plot\nfig.show()",
+        "response_message": "Here's the generated code:",
+        "response_audio": null,
+        "decision": {
+          "action": "code_generation"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.0349,
+          "generate_plan_sec": 7.2538,
+          "generate_code_sec": 12.0775
+        }
+      },
+      "benchmark_file": "iris_code_benchmark_ru.json"
+    },
+    {
+      "benchmark_id": "code_003_train_model",
+      "expected_decision": "code_generation",
+      "model_decision": {
+        "action": "code_generation"
+      },
+      "generated_code": "import pandas as pd\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import accuracy_score, classification_report\n\n# Load the dataset\ndata = pd.read_csv('your_dataset.csv')\n\n# Split the data into features and target\nX = data[['sepal_length', 'sepal_width', 'petal_length', 'petal_width']]\ny = data['species']\n\n# Split the data into training and testing sets\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\n\n# Train the logistic regression model\nmodel = LogisticRegression()\nmodel.fit(X_train, y_train)\n\n# Make predictions on the test set\ny_pred = model.predict(X_test)\n\n# Evaluate the model\naccuracy = accuracy_score(y_test, y_pred)\nprint(f\"Accuracy: {accuracy:.2f}\")\n\n# Print the classification report\nprint(classification_report(y_test, y_pred))\n\n# Plot the results\nimport plotly.express as px\n\nfig = px.scatter(\n    x=X_test,\n    y=y_test,\n    color=y_pred,\n    title=\"Logistic Regression Classification\",\n    labels={\n        'x': 'Sepal Length',\n        'y': 'Sepal Width',\n        'color': 'Predicted Species'\n    }\n)\n\nfig.show()",
+      "response_message": "Here's the generated code:",
+      "timing_info": {
+        "decide_action_sec": 2.1795,
+        "generate_plan_sec": 7.2468,
+        "generate_code_sec": 22.837
+      },
+      "raw_state": {
+        "user_input": "Напиши код, который обучает простой классификатор на этих данных.",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": "import pandas as pd\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import accuracy_score, classification_report\n\n# Load the dataset\ndata = pd.read_csv('your_dataset.csv')\n\n# Split the data into features and target\nX = data[['sepal_length', 'sepal_width', 'petal_length', 'petal_width']]\ny = data['species']\n\n# Split the data into training and testing sets\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\n\n# Train the logistic regression model\nmodel = LogisticRegression()\nmodel.fit(X_train, y_train)\n\n# Make predictions on the test set\ny_pred = model.predict(X_test)\n\n# Evaluate the model\naccuracy = accuracy_score(y_test, y_pred)\nprint(f\"Accuracy: {accuracy:.2f}\")\n\n# Print the classification report\nprint(classification_report(y_test, y_pred))\n\n# Plot the results\nimport plotly.express as px\n\nfig = px.scatter(\n    x=X_test,\n    y=y_test,\n    color=y_pred,\n    title=\"Logistic Regression Classification\",\n    labels={\n        'x': 'Sepal Length',\n        'y': 'Sepal Width',\n        'color': 'Predicted Species'\n    }\n)\n\nfig.show()",
+        "response_message": "Here's the generated code:",
+        "response_audio": null,
+        "decision": {
+          "action": "code_generation"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.1795,
+          "generate_plan_sec": 7.2468,
+          "generate_code_sec": 22.837
+        }
+      },
+      "benchmark_file": "iris_code_benchmark_ru.json"
+    },
+    {
+      "benchmark_id": "chat_001_what_is_iris",
+      "expected_decision": "chat_response",
+      "model_decision": {
+        "action": "chat_response"
+      },
+      "generated_code": null,
+      "response_message": "This dataset represents a dataset of 150 samples, each containing information about a flower. The dataset includes the following features:\n- Sepal length\n- Sepal width\n- Petal length\n- Petal width\n- Species\nThe dataset is used for various purposes, such as:\n1. Data analysis: To understand the relationship between different features and the species of flowers.\n2. Machine learning: To build models that can predict the species of flowers based on their features.\n3. Image classification: To classify images of flowers into different categories.\n4. Data visualization: To visualize the dataset and understand its structure.\nThe dataset is available in various formats, including CSV, Excel, and JSON, and can be easily accessed and manipulated using Python libraries such as Pandas.",
+      "timing_info": {
+        "decide_action_sec": 2.0422,
+        "generate_chat_response_sec": 8.3587
+      },
+      "raw_state": {
+        "user_input": "Explain what this dataset represents.",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": null,
+        "response_message": "This dataset represents a dataset of 150 samples, each containing information about a flower. The dataset includes the following features:\n- Sepal length\n- Sepal width\n- Petal length\n- Petal width\n- Species\nThe dataset is used for various purposes, such as:\n1. Data analysis: To understand the relationship between different features and the species of flowers.\n2. Machine learning: To build models that can predict the species of flowers based on their features.\n3. Image classification: To classify images of flowers into different categories.\n4. Data visualization: To visualize the dataset and understand its structure.\nThe dataset is available in various formats, including CSV, Excel, and JSON, and can be easily accessed and manipulated using Python libraries such as Pandas.",
+        "response_audio": null,
+        "decision": {
+          "action": "chat_response"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.0422,
+          "generate_chat_response_sec": 8.3587
+        }
+      },
+      "benchmark_file": "iris_text_benchmark_en.json"
+    },
+    {
+      "benchmark_id": "chat_002_how_many_classes",
+      "expected_decision": "chat_response",
+      "model_decision": {
+        "action": "chat_response"
+      },
+      "generated_code": null,
+      "response_message": "The dataset contains 5 classes.",
+      "timing_info": {
+        "decide_action_sec": 2.0354,
+        "generate_chat_response_sec": 1.1923
+      },
+      "raw_state": {
+        "user_input": "How many classes are in this dataset?",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": null,
+        "response_message": "The dataset contains 5 classes.",
+        "response_audio": null,
+        "decision": {
+          "action": "chat_response"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.0354,
+          "generate_chat_response_sec": 1.1923
+        }
+      },
+      "benchmark_file": "iris_text_benchmark_en.json"
+    },
+    {
+      "benchmark_id": "chat_003_best_features",
+      "expected_decision": "chat_response",
+      "model_decision": {
+        "action": "chat_response"
+      },
+      "generated_code": null,
+      "response_message": "The features that best separate the iris species are sepal length and sepal width.",
+      "timing_info": {
+        "decide_action_sec": 2.0453,
+        "generate_chat_response_sec": 1.7019
+      },
+      "raw_state": {
+        "user_input": "Which features best separate the iris species?",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": null,
+        "response_message": "The features that best separate the iris species are sepal length and sepal width.",
+        "response_audio": null,
+        "decision": {
+          "action": "chat_response"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.0453,
+          "generate_chat_response_sec": 1.7019
+        }
+      },
+      "benchmark_file": "iris_text_benchmark_en.json"
+    },
+    {
+      "benchmark_id": "chat_004_easiest_class",
+      "expected_decision": "chat_response",
+      "model_decision": {
+        "action": "chat_response"
+      },
+      "generated_code": null,
+      "response_message": "The easiest iris species to separate from the others is the Iris versicolor.",
+      "timing_info": {
+        "decide_action_sec": 2.0487,
+        "generate_chat_response_sec": 1.575
+      },
+      "raw_state": {
+        "user_input": "Which iris species is the easiest to separate from the others?",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": null,
+        "response_message": "The easiest iris species to separate from the others is the Iris versicolor.",
+        "response_audio": null,
+        "decision": {
+          "action": "chat_response"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.0487,
+          "generate_chat_response_sec": 1.575
+        }
+      },
+      "benchmark_file": "iris_text_benchmark_en.json"
+    },
+    {
+      "benchmark_id": "theory_001_overfitting",
+      "expected_decision": "chat_response",
+      "model_decision": {
+        "action": "chat_response"
+      },
+      "generated_code": null,
+      "response_message": "Overfitting is a common problem in machine learning where a model learns the training data too well, making it perform poorly on unseen data. It occurs when a model's performance is significantly improved by training on too many training examples, leading to a poor generalization ability.",
+      "timing_info": {
+        "decide_action_sec": 2.0306,
+        "generate_chat_response_sec": 3.4174
+      },
+      "raw_state": {
+        "user_input": "What is overfitting in machine learning?",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": null,
+        "response_message": "Overfitting is a common problem in machine learning where a model learns the training data too well, making it perform poorly on unseen data. It occurs when a model's performance is significantly improved by training on too many training examples, leading to a poor generalization ability.",
+        "response_audio": null,
+        "decision": {
+          "action": "chat_response"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.0306,
+          "generate_chat_response_sec": 3.4174
+        }
+      },
+      "benchmark_file": "iris_text_benchmark_en.json"
+    },
+    {
+      "benchmark_id": "theory_002_train_test_split",
+      "expected_decision": "chat_response",
+      "model_decision": {
+        "action": "chat_response"
+      },
+      "generated_code": null,
+      "response_message": "A train-test split is used to evaluate the performance of a machine learning model. It is a common technique in machine learning to divide the data into two subsets: one for training the model and another for testing it. This helps in reducing the risk of overfitting by ensuring that the model is not too complex on the training data.",
+      "timing_info": {
+        "decide_action_sec": 2.0338,
+        "generate_chat_response_sec": 4.0324
+      },
+      "raw_state": {
+        "user_input": "Why is a train-test split used?",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": null,
+        "response_message": "A train-test split is used to evaluate the performance of a machine learning model. It is a common technique in machine learning to divide the data into two subsets: one for training the model and another for testing it. This helps in reducing the risk of overfitting by ensuring that the model is not too complex on the training data.",
+        "response_audio": null,
+        "decision": {
+          "action": "chat_response"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.0338,
+          "generate_chat_response_sec": 4.0324
+        }
+      },
+      "benchmark_file": "iris_text_benchmark_en.json"
+    },
+    {
+      "benchmark_id": "theory_003_regularization",
+      "expected_decision": "chat_response",
+      "model_decision": {
+        "action": "chat_response"
+      },
+      "generated_code": null,
+      "response_message": "Regularization is a technique used to prevent overfitting in machine learning models. It involves adding a penalty term to the loss function, which discourages the model from fitting the training data too closely. This penalty term is typically a constant value, often set to a small positive number, such as 1e-5 or 1e-6. Regularization helps prevent the model from becoming too complex and overfitting, which can lead to poor generalization to new data.",
+      "timing_info": {
+        "decide_action_sec": 2.0328,
+        "generate_chat_response_sec": 5.4464
+      },
+      "raw_state": {
+        "user_input": "What is regularization and why is it used?",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": null,
+        "response_message": "Regularization is a technique used to prevent overfitting in machine learning models. It involves adding a penalty term to the loss function, which discourages the model from fitting the training data too closely. This penalty term is typically a constant value, often set to a small positive number, such as 1e-5 or 1e-6. Regularization helps prevent the model from becoming too complex and overfitting, which can lead to poor generalization to new data.",
+        "response_audio": null,
+        "decision": {
+          "action": "chat_response"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.0328,
+          "generate_chat_response_sec": 5.4464
+        }
+      },
+      "benchmark_file": "iris_text_benchmark_en.json"
+    },
+    {
+      "benchmark_id": "theory_004_bias_variance",
+      "expected_decision": "chat_response",
+      "model_decision": {
+        "action": "chat_response"
+      },
+      "generated_code": null,
+      "response_message": "The bias-variance tradeoff is a fundamental concept in statistics that describes how the variance of a dataset can be reduced by adding more data points. It is a measure of the amount of variation in a dataset that can be explained by adding more data points. The tradeoff is often expressed as a trade-off between the amount of variance explained by the additional data points and the amount of variance that can be explained by the original data points.",
+      "timing_info": {
+        "decide_action_sec": 2.0331,
+        "generate_chat_response_sec": 4.9673
+      },
+      "raw_state": {
+        "user_input": "Explain the bias-variance tradeoff.",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": null,
+        "response_message": "The bias-variance tradeoff is a fundamental concept in statistics that describes how the variance of a dataset can be reduced by adding more data points. It is a measure of the amount of variation in a dataset that can be explained by adding more data points. The tradeoff is often expressed as a trade-off between the amount of variance explained by the additional data points and the amount of variance that can be explained by the original data points.",
+        "response_audio": null,
+        "decision": {
+          "action": "chat_response"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.0331,
+          "generate_chat_response_sec": 4.9673
+        }
+      },
+      "benchmark_file": "iris_text_benchmark_en.json"
+    },
+    {
+      "benchmark_id": "chat_001_what_is_iris",
+      "expected_decision": "chat_response",
+      "model_decision": {
+        "action": "chat_response"
+      },
+      "generated_code": null,
+      "response_message": "Датасет представляет собой набор данных, содержащий информацию о различных аспектах животных, такие как их размеры, цвета, и семена.",
+      "timing_info": {
+        "decide_action_sec": 2.0411,
+        "generate_chat_response_sec": 2.4628
+      },
+      "raw_state": {
+        "user_input": "Поясни, что представляет собой датасет.",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": null,
+        "response_message": "Датасет представляет собой набор данных, содержащий информацию о различных аспектах животных, такие как их размеры, цвета, и семена.",
+        "response_audio": null,
+        "decision": {
+          "action": "chat_response"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.0411,
+          "generate_chat_response_sec": 2.4628
+        }
+      },
+      "benchmark_file": "iris_text_benchmark_ru.json"
+    },
+    {
+      "benchmark_id": "chat_002_how_many_classes",
+      "expected_decision": "chat_response",
+      "model_decision": {
+        "action": "chat_response"
+      },
+      "generated_code": null,
+      "response_message": "В этом датасете 3 класса.",
+      "timing_info": {
+        "decide_action_sec": 2.0378,
+        "generate_chat_response_sec": 1.377
+      },
+      "raw_state": {
+        "user_input": "Сколько классов в этом датасете?",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": null,
+        "response_message": "В этом датасете 3 класса.",
+        "response_audio": null,
+        "decision": {
+          "action": "chat_response"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.0378,
+          "generate_chat_response_sec": 1.377
+        }
+      },
+      "benchmark_file": "iris_text_benchmark_ru.json"
+    },
+    {
+      "benchmark_id": "chat_003_best_features",
+      "expected_decision": "chat_response",
+      "model_decision": {
+        "action": "code_generation"
+      },
+      "generated_code": "import pandas as pd\nimport plotly.express as px\n\n# Load the DataFrame\ndf = pd.read_csv('iris.csv')\n\n# Calculate the number of species per sepal length\nspecies_counts = df.groupby('sepal_length')['species'].count()\n\n# Create a bar chart\nfig = px.bar(species_counts, x='sepal_length', y='species', color='species', title='Number of Species per Sepal Length')\nfig.show()",
+      "response_message": "Here's the generated code:",
+      "timing_info": {
+        "decide_action_sec": 2.1805,
+        "generate_plan_sec": 7.2389,
+        "generate_code_sec": 13.4743
+      },
+      "raw_state": {
+        "user_input": "Какие признаки лучше всего разделяют виды ирисов?",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": "import pandas as pd\nimport plotly.express as px\n\n# Load the DataFrame\ndf = pd.read_csv('iris.csv')\n\n# Calculate the number of species per sepal length\nspecies_counts = df.groupby('sepal_length')['species'].count()\n\n# Create a bar chart\nfig = px.bar(species_counts, x='sepal_length', y='species', color='species', title='Number of Species per Sepal Length')\nfig.show()",
+        "response_message": "Here's the generated code:",
+        "response_audio": null,
+        "decision": {
+          "action": "code_generation"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.1805,
+          "generate_plan_sec": 7.2389,
+          "generate_code_sec": 13.4743
+        }
+      },
+      "benchmark_file": "iris_text_benchmark_ru.json"
+    },
+    {
+      "benchmark_id": "chat_004_easiest_class",
+      "expected_decision": "chat_response",
+      "model_decision": {
+        "action": "chat_response"
+      },
+      "generated_code": null,
+      "response_message": "Вид ириса, который лучше всего отделяется от остальных, является квадрат.",
+      "timing_info": {
+        "decide_action_sec": 2.027,
+        "generate_chat_response_sec": 1.8997
+      },
+      "raw_state": {
+        "user_input": "Какой вид ириса лучше всего отделяется от остальных?",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": null,
+        "response_message": "Вид ириса, который лучше всего отделяется от остальных, является квадрат.",
+        "response_audio": null,
+        "decision": {
+          "action": "chat_response"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.027,
+          "generate_chat_response_sec": 1.8997
+        }
+      },
+      "benchmark_file": "iris_text_benchmark_ru.json"
+    },
+    {
+      "benchmark_id": "theory_001_overfitting",
+      "expected_decision": "chat_response",
+      "model_decision": {
+        "action": "chat_response"
+      },
+      "generated_code": null,
+      "response_message": "Переобучение в машинном обучении - это процесс, когда модель обучается на данных, которые не соответствуют ожиданиям или требованиям, что приводит к переобучению модели. Это может быть связано с различными факторами, таких как переобучение модели на слишком малых данных, переобучение модели на слишком большом наборе данных, переобучение модели на слишком сложных или сложных задачах, переобучение модели на слишком малых или слишком большом количестве признаков.",
+      "timing_info": {
+        "decide_action_sec": 2.0309,
+        "generate_chat_response_sec": 6.6109
+      },
+      "raw_state": {
+        "user_input": "Что такое переобучение в машинном обучении?",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": null,
+        "response_message": "Переобучение в машинном обучении - это процесс, когда модель обучается на данных, которые не соответствуют ожиданиям или требованиям, что приводит к переобучению модели. Это может быть связано с различными факторами, таких как переобучение модели на слишком малых данных, переобучение модели на слишком большом наборе данных, переобучение модели на слишком сложных или сложных задачах, переобучение модели на слишком малых или слишком большом количестве признаков.",
+        "response_audio": null,
+        "decision": {
+          "action": "chat_response"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.0309,
+          "generate_chat_response_sec": 6.6109
+        }
+      },
+      "benchmark_file": "iris_text_benchmark_ru.json"
+    },
+    {
+      "benchmark_id": "theory_002_train_test_split",
+      "expected_decision": "chat_response",
+      "model_decision": {
+        "action": "chat_response"
+      },
+      "generated_code": null,
+      "response_message": "Зачем используется разделение на обучающую и тестовую выборки? Это делает выборы более эффективным и предсказуемым, особенно при большом количестве данных.",
+      "timing_info": {
+        "decide_action_sec": 2.1737,
+        "generate_chat_response_sec": 2.8949
+      },
+      "raw_state": {
+        "user_input": "Зачем используется разделение на обучающую и тестовую выборки?",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": null,
+        "response_message": "Зачем используется разделение на обучающую и тестовую выборки? Это делает выборы более эффективным и предсказуемым, особенно при большом количестве данных.",
+        "response_audio": null,
+        "decision": {
+          "action": "chat_response"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.1737,
+          "generate_chat_response_sec": 2.8949
+        }
+      },
+      "benchmark_file": "iris_text_benchmark_ru.json"
+    },
+    {
+      "benchmark_id": "theory_003_regularization",
+      "expected_decision": "chat_response",
+      "model_decision": {
+        "action": "chat_response"
+      },
+      "generated_code": null,
+      "response_message": "Регуляризация - это процесс, который устраняет или убирает ошибки в данных, чтобы они были более точными и полезными для анализа. Она помогает улучшить качество данных, устранить неправильные значения или ошибки в данных, которые могут привести к ошибкам при анализе.",
+      "timing_info": {
+        "decide_action_sec": 2.1788,
+        "generate_chat_response_sec": 4.4911
+      },
+      "raw_state": {
+        "user_input": "Что такое регуляризация и зачем она нужна?",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": null,
+        "response_message": "Регуляризация - это процесс, который устраняет или убирает ошибки в данных, чтобы они были более точными и полезными для анализа. Она помогает улучшить качество данных, устранить неправильные значения или ошибки в данных, которые могут привести к ошибкам при анализе.",
+        "response_audio": null,
+        "decision": {
+          "action": "chat_response"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.1788,
+          "generate_chat_response_sec": 4.4911
+        }
+      },
+      "benchmark_file": "iris_text_benchmark_ru.json"
+    },
+    {
+      "benchmark_id": "theory_004_bias_variance",
+      "expected_decision": "chat_response",
+      "model_decision": {
+        "action": "chat_response"
+      },
+      "generated_code": null,
+      "response_message": "Смещение и разброс - это два различных метода, которые используются для улучшения качества данных. Смещение - это процесс, который позволяет изменить расположение данных в массиве, чтобы улучшить его структуру и качество. Разброс, наоборот, - это процесс, который позволяет изменить распределение данных в массиве, чтобы улучшить его структуру и качество.",
+      "timing_info": {
+        "decide_action_sec": 2.1743,
+        "generate_chat_response_sec": 5.1097
+      },
+      "raw_state": {
+        "user_input": "Объясни компромисс между смещением и разбросом.",
+        "conversation_history": [],
+        "metadata": {
+          "sepal_length": "float",
+          "sepal_width": "float",
+          "petal_length": "float",
+          "petal_width": "float",
+          "species": "category"
+        },
+        "generated_code": null,
+        "response_message": "Смещение и разброс - это два различных метода, которые используются для улучшения качества данных. Смещение - это процесс, который позволяет изменить расположение данных в массиве, чтобы улучшить его структуру и качество. Разброс, наоборот, - это процесс, который позволяет изменить распределение данных в массиве, чтобы улучшить его структуру и качество.",
+        "response_audio": null,
+        "decision": {
+          "action": "chat_response"
+        },
+        "timing_info": {
+          "decide_action_sec": 2.1743,
+          "generate_chat_response_sec": 5.1097
+        }
+      },
+      "benchmark_file": "iris_text_benchmark_ru.json"
+    }
+  ]
+}

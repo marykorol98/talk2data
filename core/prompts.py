@@ -1,6 +1,9 @@
 # prompts.py
 
+import json
 from typing import TypedDict
+
+from string import Template
 
 
 class PromptMessage(TypedDict):
@@ -78,7 +81,7 @@ CHAT_RESPONSE_PROMPT: list[PromptMessage] = [
 
 
 # Code generation prompt as chat messages
-CODE_GENERATION_PROMPT: list[PromptMessage] = [
+CODE_GENERATION_PROMPT = [
     {
         "role": "system",
         "content": (
@@ -95,3 +98,76 @@ CODE_GENERATION_PROMPT: list[PromptMessage] = [
     },
     {"role": "user", "content": "Request: $input"},
 ]
+
+CODE_BEGIN = "PY_CODE_BEGIN"
+CODE_END = "PY_CODE_END"
+PLAN_BEGIN = "PLAN_JSON_BEGIN"
+PLAN_END = "PLAN_JSON_END"
+
+def _mapping_from_state(state: dict) -> dict:
+    return {
+        "input": str(state.get("user_input", "")),
+        "history": str(state.get("conversation_history", "")),
+        "metadata": str(state.get("metadata", {})),
+    }
+    
+
+def _render_messages(state: dict, extra_user_content: str | None = None) -> list[dict]:
+    m = _mapping_from_state(state)
+    msgs = [
+        {
+            "role": "system",
+            "content": Template(CODE_GENERATION_PROMPT[0]["content"]).safe_substitute(m),
+        },
+        {
+            "role": "user",
+            "content": Template(CODE_GENERATION_PROMPT[1]["content"]).safe_substitute(m),
+        },
+    ]
+    if extra_user_content:
+        msgs.append({"role": "user", "content": extra_user_content})
+    return msgs
+
+def build_code_prompt(state: dict) -> list[dict]:
+    plan_blob = json.dumps(state.get("plan", {}), ensure_ascii=False)
+
+    code_user = (
+        "Use the internal JSON plan below to generate Python code.\n"
+        "Do NOT output the plan. Do NOT output explanations. Do NOT output comments.\n"
+        f"Return ONLY python code wrapped strictly between markers:\n"
+        f"{CODE_BEGIN}\n"
+        "<python code>\n"
+        f"{CODE_END}\n\n"
+        f"Internal plan JSON:\n{plan_blob}\n\n"
+        "Hard rules:\n"
+        "- Only use df and its existing columns. DO NOT use pd.read_csv, df is already in the context, use this variable as it is\n"
+        "- No external files, URLs, or fabricated data.\n"
+        "- When a user requests basic statistics or a quick overview, return concise Pandas operations instead of plots. Create visualizations only when explicitly requested.\n"
+        "- For plots use plotly only (px or go).\n"
+        "- No markdown fences.\n"
+    )
+
+    messages = _render_messages(state, extra_user_content=code_user)
+    return messages
+
+
+def build_plan_prompt(state: dict) -> list[dict]:
+    plan_user = (
+        "Produce a SHORT internal execution plan as JSON.\n"
+        "Do NOT provide reasoning. Do NOT provide any text outside the JSON.\n"
+        f"Return ONLY between markers {PLAN_BEGIN} and {PLAN_END}.\n\n"
+        f"{PLAN_BEGIN}\n"
+        "{\n"
+        '  "intent": "stats" | "plot",\n'
+        '  "columns_used": ["col1", "col2"],\n'
+        '  "ops": ["step1", "step2"],\n'
+        '  "plot_spec": {"kind": "line|bar|scatter|hist|box|heatmap|other", "x": "...", "y": "...", "color": null, "facet": null},\n'
+        '  "notes": "short notes (e.g., convert to datetime) or empty"\n'
+        "}\n"
+        f"{PLAN_END}\n\n"
+        "Rules:\n"
+        "- If the user did NOT explicitly ask for a plot/visualization, set intent='stats'.\n"
+        "- Use only columns that exist in the provided metadata.\n"
+    )
+    messages = _render_messages(state, extra_user_content=plan_user)
+    return messages
