@@ -70,7 +70,7 @@ def decision_accuracy(items: list[dict[str, Any]]) -> float:
     return good / total if total else float("nan")
 
 
-judge = GeminiModel(model="gemini-2.5-flash", temperature=0, api_key="AIzaSyCFJrPw2le6A90DWxmbic8MhsTuYv58UXU")
+judge = GeminiModel(model="gemini-2.5-flash", temperature=0, api_key="my_api")
 
 
 def main() -> None:
