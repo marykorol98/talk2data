@@ -11,3 +11,4 @@ cache/
 reports/
 .hypothesis/
 .mypy_cache/
+.deepeval/
